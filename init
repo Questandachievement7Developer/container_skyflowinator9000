@@ -9,8 +9,8 @@ for a in $(ls .); do
 if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
-ffmpeg -i "${a}" -filter "minterpolate='fps=60'" "${gamemedia}/Processed/${a}_Processed.mp4"
 echo ${a} Processing Debug
+ffmpeg -i "${a}" -filter "minterpolate='fps=60'" "Processed/${a}_Processed.mp4"
 fi
 done
 sleep 30
