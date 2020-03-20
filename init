@@ -11,7 +11,7 @@ if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ]; then
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
 echo ${a} Processing Debug
 #https://superuser.com/questions/1222592/ffmpeg-fps-interpolation-error
-ffmpeg -i "${a}" -filter:v "minterpolate='fps=60'" -c:a copy  "Processed/${a}_Processed.mp4"
+ffmpeg -i "${a}" -qscale:v 3 -filter:v "minterpolate='fps=60', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "Processed/${a}_Processed.mp4"
 fi
 done
 sleep 30
