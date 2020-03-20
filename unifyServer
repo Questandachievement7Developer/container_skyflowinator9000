@@ -2481,11 +2481,6 @@ fi
 #Second, .bashrc is not read by non-interactive shells unless you set the BASH_ENV environment variable.
 #But most importantly: don't do that! Please? One day you will move that script somewhere where the necessary aliases are not set and it will break again.
 #Instead set and use environment variables as shortcuts in your script:
-
-
-
-  alias hw_usb="echo lsusb"
-  hw_usb
   "${1}" "${2}" "${3}" "${4}" &
 }
 
