@@ -6,7 +6,7 @@ cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
 for a in $(ls .); do
-if [ ! -f "${gamemedia}/Processed_${a}_Processed" ]; then
+if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4"]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
 ffmpeg -i "${a}" -filter "minterpolate='fps=60'" "${gamemedia}/Processed/${a}_Processed.mp4"
