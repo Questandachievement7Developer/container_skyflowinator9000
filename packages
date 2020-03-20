@@ -1,3 +1,6 @@
 ffmpeg
 python
 python-setuptools
+base-devel
+git
+nano
