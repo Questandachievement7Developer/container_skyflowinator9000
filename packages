@@ -4,3 +4,4 @@ python-setuptools
 base-devel
 git
 nano
+jdk-openjdk
