@@ -1,13 +1,13 @@
 #!/bin/sh
-export gamemedia=/exposed/DCIM/Game\ media/sky
-if [ -d ${gamemedia}]; then
-mkdir ${gamemedia}/Processed
-cd ${gamemedia}
+export gamemedia="/exposed/DCIM/Game media/sky"
+if [ -d "${gamemedia}" ]; then
+mkdir "${gamemedia}/Processed"
+cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
 for a in $(ls .); do
-if [ ${gamemedia}/Processed_${a}_Processed ]; then
-echo ${a} > ${gamemedia}/Processed/${a}_Processed
+if [ ! -f "${gamemedia}/Processed_${a}_Processed" ]; then
+echo ${a} > "${gamemedia}/Processed/${a}_Processed"
 echo ${a} Processing Debug
 fi
 done
