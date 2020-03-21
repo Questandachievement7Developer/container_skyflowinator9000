@@ -24,10 +24,13 @@ ffmpeg -i ${a} -c copy -map 0 -segment_frames 123 -reset_timestamps 1  -f segmen
 ###
 count=0
 cd temp
-for c in $(ls . |grep "${a}_0processed*.mp4"); do
+for c in $( ls . | grep "${a}_0processed*.mp4" ); do
 count=$(( count+1 ))
 ffmpeg -i "${c}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "temp/${a}_1Processed${count}.mp4" &
 done
+
+
+
 
 
 #start multithreading workloads
