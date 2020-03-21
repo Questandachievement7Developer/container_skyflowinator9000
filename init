@@ -46,7 +46,9 @@ count=$(( count+1 ))
 echo Processing Thread ${count}
 processInterpolation ${c} ${count} ${vidtarget} &
 done
-
+echo =======================
+echo WAIT LOOP
+echo =======================
 #To check whether the thread already shutted down
 waitloop(){
 finish=1
