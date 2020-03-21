@@ -29,8 +29,8 @@ framesegment=$(( ${framecount} / ${thread} ))
 #This will work
 #https://superuser.com/questions/820747/slicing-video-file-into-several-segments
 #ffmpeg -i ${a} -c copy -map 0 -segment_time ${threads} -f segment temp/${a}_0Processed%01d.mp4
-ffmpeg -i "${a}" -c:v libx264 -crf 22 -map 0 -segment_time 9 -g 9 -sc_threshold 0 -force_key_frames "expr:gte(t,n_forced*9)" -f segment temp/${a}_0Processed%01d.mp4
-
+#ffmpeg -i "${a}" -c:v libx264 -crf 22 -map 0 -segment_time 9 -g 9 -sc_threshold 0 -force_key_frames "expr:gte(t,n_forced*9)" -f segment temp/${a}_0Processed%01d.mp4
+ffmpeg -i "${a}" -c copy -map 0 -segment_time ${threads} -f segment "temp/${a}_0Processed%01d.mp4"
 ###
 count=0
 cd temp
