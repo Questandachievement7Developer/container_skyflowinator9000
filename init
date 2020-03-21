@@ -36,7 +36,8 @@ rm thread_${2}
 echo ============================================
 echo Process Interpolation
 echo ============================================
-for c in $( ls . | grep "${a}_0processed*.mp4" ); do
+
+for c in $( ls . | grep "${a}_0processed" ); do
 count=$(( count+1 ))
 echo Processing Thread ${count}
 processInterpolation ${c} ${count} &
