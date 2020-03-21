@@ -1,5 +1,5 @@
 #!/bin/sh
-set +x
+set -x
 export gamemedia="/exposed/DCIM/Game media/sky"
 if [ -d "${gamemedia}" ]; then
 mkdir "${gamemedia}/Processed"
