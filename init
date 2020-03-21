@@ -6,7 +6,9 @@ mkdir "${gamemedia}/temp"
 cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
+cd "${gamemedia}"
 for a in $(ls .); do
+export vidtarget=${a}
 if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
@@ -20,15 +22,39 @@ framesegment=$(( ${framecount} / ${thread} ))
 #Temporary Multithreading Workloads
 #ffmpeg -i input.mp4 -c copy -map 0 -segment_time 00:20:00 -f segment output%03d.mp4
 #https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
-ffmpeg -i ${a} -c copy -map 0 -segment_frames 123 -reset_timestamps 1  -f segment temp/${a}_0Processed%03d.mp4
+ffmpeg -i ${a} -c copy -map 0 -segment_frames ${framesegment} -reset_timestamps 1  -f segment temp/${a}_0Processed%03d.mp4
 ###
 count=0
 cd temp
+
+processInterpolation(){
+echo 1 > thread_${2}
+ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${1}_1Processed${2}.mp4" &
+rm thread_${2}
+}
+
 for c in $( ls . | grep "${a}_0processed*.mp4" ); do
 count=$(( count+1 ))
-ffmpeg -i "${c}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "temp/${a}_1Processed${count}.mp4" &
+processInterpolation ${c} ${count} &
 done
 
+#To check whether the thread already shutted down
+waitloop(){
+finish=1
+for (( co=1; co<=${thread}; co++ )); do
+if [ -f thread_${co} ] ;then
+echo Thread ${co} is not finished yet
+finish=0
+fi
+done
+if [ finish == "0" ] ;then
+echo "Waiting for next check"
+sleep 30
+waitloop
+else
+echo "All threads have finished"
+fi
+}
 
 
 
@@ -37,7 +63,13 @@ done
 #ffmpeg -i "${a}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "Processed/${a}_Processed.mp4"
 ## Concatenate to Processed folder
 
-
+concatenateVid(){
+for f in ./${vidtarget}_1Processed*.mp4; do echo "file '$f'" >> concatenate.txt; done
+ffmpeg -f concat -i mylist.txt -c copy ../Processed/${vidtarget}_Processed.mp4
+}
+concatenateVid 
+#{1}_1Processed${2}.mp4
+#####################
 fi
 done
 sleep 30
