@@ -10,18 +10,17 @@ while true ; do
 cd "${gamemedia}"
 for a in $(ls .); do
 export vidtarget=${a}
-if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ]; then
+if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ] && [ ${a} != "Processed" ]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
 echo ${a} Converting video into 144fps
 #https://superuser.com/questions/1222592/ffmpeg-fps-interpolation-error
 #Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
-framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 -)
+framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 - )
 echo ${a} splitting threads
 thread=8
 framesegment=$(( ${framecount} / ${thread} ))
 #Temporary Multithreading Workloads
-#ffmpeg -i input.mp4 -c copy -map 0 -segment_time 00:20:00 -f segment output%03d.mp4
 #https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
 ffmpeg -i ${a} -c copy -map 0 -segment_frames ${framesegment} -reset_timestamps 1  -f segment temp/${a}_0Processed%03d.mp4
 ###
