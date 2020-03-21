@@ -35,6 +35,7 @@ rm thread_${2}
 }
 echo ============================================
 echo Process Interpolation
+ls . | grep "${a}_0processed"
 echo ============================================
 
 for c in $( ls . | grep "${a}_0processed" ); do
