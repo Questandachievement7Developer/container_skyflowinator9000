@@ -76,6 +76,8 @@ fi
 
 concatenateVid(){
 for f in ./${vidtarget}_1Processed* ; do echo "file '$f'" >> concatenate.txt; done
+sed "s/${vidtarget}_1Processed\*//" ${containerFilesList} > "concatenate.txt_tmp"
+mv concatenate.txt_tmp concatenate.txt
 ffmpeg -f concat -i concatenate.txt -c copy ../Processed/${vidtarget}_Processed.mp4
 }
 concatenateVid 
