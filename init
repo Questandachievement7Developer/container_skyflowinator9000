@@ -30,7 +30,7 @@ cd temp
 
 processInterpolation(){
 echo 1 > thread_${2}
-ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${1}_1Processed${2}.mp4" &
+ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${1}_1Processed${2}.mp4"
 rm thread_${2}
 }
 echo Process Interpolation
@@ -66,7 +66,7 @@ fi
 ## Concatenate to Processed folder
 
 concatenateVid(){
-for f in ./${vidtarget}_1Processed*.mp4; do echo "file '$f'" >> concatenate.txt; done
+for f in ./${vidtarget}_1Processed*; do echo "file '$f'" >> concatenate.txt; done
 ffmpeg -f concat -i concatenate.txt -c copy ../Processed/${vidtarget}_Processed.mp4
 }
 concatenateVid 
