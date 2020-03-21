@@ -19,7 +19,7 @@ echo ${a} Converting video into 144fps
 #Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
 framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 - )
 echo ${a} splitting threads
-thread=8
+thread=4
 framesegment=$(( ${framecount} / ${thread} ))
 #Temporary Multithreading Workloads
 #https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
