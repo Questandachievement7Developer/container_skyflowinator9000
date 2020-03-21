@@ -36,6 +36,7 @@ rm thread_${2}
 
 for c in $( ls . | grep "${a}_0processed*.mp4" ); do
 count=$(( count+1 ))
+echo Processing Thread ${count}
 processInterpolation ${c} ${count} &
 done
 
