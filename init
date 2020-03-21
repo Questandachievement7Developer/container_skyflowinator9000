@@ -41,7 +41,7 @@ ls .
 ls . | grep "${a}_0processed"
 echo ============================================
 
-for c in $( ls . ); do
+for c in ./${vidtarget}_0Processed* ; do
 count=$(( count+1 ))
 echo Processing Thread ${count}
 processInterpolation ${c} ${count} &
