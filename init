@@ -2,6 +2,7 @@
 export gamemedia="/exposed/DCIM/Game media/sky"
 if [ -d "${gamemedia}" ]; then
 mkdir "${gamemedia}/Processed"
+mkdir "${gamemedia}/temp"
 cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
@@ -9,11 +10,31 @@ for a in $(ls .); do
 if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
-echo ${a} Processing Debug
+echo ${a} Converting video into 144fps
 #https://superuser.com/questions/1222592/ffmpeg-fps-interpolation-error
 #Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
+framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 -)
+echo ${a} splitting threads
+thread=8
+framesegment=$(( ${framecount} / ${thread} ))
+#Temporary Multithreading Workloads
+#ffmpeg -i input.mp4 -c copy -map 0 -segment_time 00:20:00 -f segment output%03d.mp4
+#https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
+ffmpeg -i ${a} -c copy -map 0 -segment_frames 123 -reset_timestamps 1  -f segment temp/${a}_0Processed%03d.mp4
+###
+count=0
+cd temp
+for c in $(ls . |grep "${a}_0processed*.mp4"); do
+count=$(( count+1 ))
+ffmpeg -i "${c}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "temp/${a}_1Processed${count}.mp4" &
+done
 
-ffmpeg -i "${a}" -qscale:v 3 -filter:v "minterpolate='fps=60', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "Processed/${a}_Processed.mp4"
+
+#start multithreading workloads
+#ffmpeg -i "${a}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "Processed/${a}_Processed.mp4"
+## Concatenate to Processed folder
+
+
 fi
 done
 sleep 30
