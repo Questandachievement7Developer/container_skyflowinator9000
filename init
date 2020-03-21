@@ -33,7 +33,9 @@ echo 1 > thread_${2}
 ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${1}_1Processed${2}.mp4"
 rm thread_${2}
 }
+echo ============================================
 echo Process Interpolation
+echo ============================================
 for c in $( ls . | grep "${a}_0processed*.mp4" ); do
 count=$(( count+1 ))
 echo Processing Thread ${count}
