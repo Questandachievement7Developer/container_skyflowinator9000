@@ -11,7 +11,7 @@ while true ; do
 cd "${gamemedia}"
 for a in $(ls .); do
 export vidtarget=${a}
-if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ] && [ ${a} != "Processed" ]; then
+if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ] && [ ${a} != "Processed" ] && [ ${a} != "temp" ]; then
 #echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
 #https://superuser.com/questions/1005315/interpolation-with-ffmpeg
 echo ${a} Converting video into 144fps
