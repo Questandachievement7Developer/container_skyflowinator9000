@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -x
 export gamemedia="/exposed/DCIM/Game media/sky"
 if [ -d "${gamemedia}" ]; then
@@ -19,7 +19,7 @@ echo ${a} Converting video into 144fps
 #Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
 framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 - )
 echo ${a} splitting threads
-thread=4
+thread=$(nproc --all)
 framesegment=$(( ${framecount} / ${thread} ))
 #Temporary Multithreading Workloads
 #https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
@@ -58,7 +58,7 @@ echo Thread ${co} is not finished yet
 finish=0
 fi
 done
-if [ finish == "0" ] ;then
+if [ finish == 0 ] ;then
 echo "Waiting for next check"
 sleep 30
 waitloop
@@ -66,7 +66,7 @@ else
 echo "All threads have finished"
 fi
 }
-
+waitloop
 
 
 
