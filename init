@@ -3,6 +3,7 @@ export gamemedia="/exposed/DCIM/Game media/sky"
 if [ -d "${gamemedia}" ]; then
 mkdir "${gamemedia}/Processed"
 mkdir "${gamemedia}/temp"
+rm -rf "${gamemedia}/temp/thread_*
 cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
