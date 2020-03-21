@@ -3,8 +3,8 @@ set -x
 export gamemedia="/exposed/DCIM/Game media/sky"
 if [ -d "${gamemedia}" ]; then
 mkdir "${gamemedia}/Processed"
+rm -rfv "${gamemedia}/temp"
 mkdir "${gamemedia}/temp"
-rm -rf "${gamemedia}/temp/*"
 cd "${gamemedia}"
 #ffmpeg routines
 while true ; do
@@ -73,7 +73,7 @@ fi
 ## Concatenate to Processed folder
 
 concatenateVid(){
-for f in ./${vidtarget}_1Processed*; do echo "file '$f'" >> concatenate.txt; done
+for f in ./${vidtarget}_1Processed* ; do echo "file '$f'" >> concatenate.txt; done
 ffmpeg -f concat -i concatenate.txt -c copy ../Processed/${vidtarget}_Processed.mp4
 }
 concatenateVid 
