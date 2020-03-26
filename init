@@ -19,11 +19,14 @@ echo ${a} Converting video into 144fps
 #Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
 framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 - )
 echo ${a} splitting threads
-thread=$(( $(nproc --all) / 2 ))
+thread=$(( $(nproc --all) / 4 ))
+if [ $thread == '0' ]; then
+thread=1
+fi
 framesegment=$(( ${framecount} / ${thread} ))
 #Temporary Multithreading Workloads
 #https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
-#ffmpeg -i ${a} -c copy -map 0 -segment_frames ${framesegment} -reset_timestamps 1  -f segment temp/${a}_0Processed%01d.mp4
+#ffmpeg -i ${a} -c copy -filter:v "scale=-1:720" -map 0 -segment_frames ${framesegment} -reset_timestamps 1  -f segment temp/${a}_0Processed%01d.mp4
 #This wont work
 
 #This will work
@@ -38,7 +41,7 @@ cd temp
 processInterpolation(){
 if [ ! -f ${1}_1Processed${2}.mp4 ]; then
 echo 1 > thread_${2}
-ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${3}_1Processed${2}.mp4"
+ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=62', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${3}_1Processed${2}.mp4"
 rm thread_${2}
 fi
 }
