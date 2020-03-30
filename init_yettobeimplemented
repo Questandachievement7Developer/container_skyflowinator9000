@@ -1,0 +1,104 @@
+#!/bin/bash
+set -x
+export gamemedia="/exposed/DCIM/Game media/sky"
+if [ -d "${gamemedia}" ]; then
+mkdir "${gamemedia}/Processed"
+rm -rfv "${gamemedia}/temp"
+mkdir "${gamemedia}/temp"
+cd "${gamemedia}"
+#ffmpeg routines
+while true ; do
+cd "${gamemedia}"
+for a in $(ls .); do
+export vidtarget=${a}
+if [ ! -f "${gamemedia}/Processed/${a}_Processed.mp4" ] && [ ${a} != "Processed" ] && [ ${a} != "temp" ]; then
+#echo "${a}" > "${gamemedia}/Processed/${a}_Processed"
+#https://superuser.com/questions/1005315/interpolation-with-ffmpeg
+echo ${a} Converting video into 144fps
+#https://superuser.com/questions/1222592/ffmpeg-fps-interpolation-error
+#Smartblur https://forum.videohelp.com/threads/389480-Need-help-with-FFMpeg-and-detail-enhancement-sharpening
+framecount=$(ffmpeg -i ${a} -map 0:v:0 -c copy -f null -y /dev/null 2>&1 | grep -Eo 'frame= *[0-9]+ *' | grep -Eo '[0-9]+' | tail -1 - )
+echo ${a} splitting threads
+thread=$(( $(nproc --all) / 4 ))
+if [ $thread == '0' ]; then
+thread=1
+fi
+framesegment=$(( ${framecount} / ${thread} ))
+#Temporary Multithreading Workloads
+#https://unix.stackexchange.com/questions/1670/how-can-i-use-ffmpeg-to-split-mpeg-video-into-10-minute-chunks
+#ffmpeg -i ${a} -c copy -filter:v "scale=-1:720" -map 0 -segment_frames ${framesegment} -reset_timestamps 1  -f segment temp/${a}_0Processed%01d.mp4
+#This wont work
+
+#This will work
+#https://superuser.com/questions/820747/slicing-video-file-into-several-segments
+#ffmpeg -i ${a} -c copy -map 0 -segment_time ${threads} -f segment temp/${a}_0Processed%01d.mp4
+#ffmpeg -i "${a}" -c:v libx264 -crf 22 -map 0 -segment_time 9 -g 9 -sc_threshold 0 -force_key_frames "expr:gte(t,n_forced*9)" -f segment temp/${a}_0Processed%01d.mp4
+ffmpeg -i "${a}" -c copy -map 0 -segment_time ${threads} -f segment "temp/${a}_0Processed%01d.mp4"
+###
+count=0
+cd temp
+
+processInterpolation(){
+if [ ! -f ${1}_1Processed${2}.mp4 ]; then
+echo 1 > thread_${2}
+ffmpeg -i "${1}" -qscale:v 3 -filter:v "minterpolate='fps=62', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "${3}_1Processed${2}.mp4"
+rm thread_${2}
+fi
+}
+echo ============================================
+echo Process Interpolation
+ls .
+ls . | grep "${a}_0processed"
+echo ============================================
+
+for c in ./${vidtarget}_0Processed* ; do
+count=$(( count+1 ))
+echo Processing Thread ${count}
+processInterpolation ${c} ${count} ${vidtarget} &
+done
+echo =======================
+echo WAIT LOOP
+echo =======================
+#To check whether the thread already shutted down
+waitloop(){
+finish=1
+for (( co=1; co<=${thread}; co++ )); do
+if [ -f thread_${co} ] ;then
+echo Thread ${co} is not finished yet
+finish=0
+fi
+done
+if [ $finish == 0 ] ;then
+echo "Waiting for next check"
+sleep 30
+waitloop
+else
+echo "All threads have finished"
+fi
+}
+waitloop
+
+
+
+#start multithreading workloads
+#ffmpeg -i "${a}" -qscale:v 3 -filter:v "minterpolate='fps=144', spp=5:10:0:1, smartblur=1.5:-0.35:-3.5:0.65:0.25:2.0" -c:a copy "Processed/${a}_Processed.mp4"
+## Concatenate to Processed folder
+
+concatenateVid(){
+for f in ./${vidtarget}_1Processed* ; do echo "file '$f'" >> concatenate.txt; done
+sed "s/${vidtarget}_1Processed\*//" ${containerFilesList} > "concatenate.txt_tmp"
+mv concatenate.txt_tmp concatenate.txt
+ffmpeg -f concat -i concatenate.txt -c copy ../Processed/${vidtarget}_Processed.mp4
+}
+concatenateVid 
+#{1}_1Processed${2}.mp4
+#####################
+fi
+done
+sleep 30
+done
+else
+echo SKY folder not detected!
+echo did you grant me the storage access
+exit
+fi
